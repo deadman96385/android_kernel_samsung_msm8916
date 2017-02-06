@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2015, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -59,7 +59,7 @@ static unsigned int no_ctrl_smd_ports;
 static unsigned int no_ctrl_qti_ports;
 static unsigned int no_ctrl_hsic_ports;
 static unsigned int no_ctrl_hsuart_ports;
-static unsigned int no_data_bam_ports;
+static unsigned int no_rmnet_data_bam_ports;
 static unsigned int no_data_bam2bam_ports;
 static unsigned int no_data_hsic_ports;
 static unsigned int no_data_hsuart_ports;
@@ -77,8 +77,13 @@ static struct usb_interface_descriptor rmnet_interface_desc = {
 	.bDescriptorType =	USB_DT_INTERFACE,
 	.bNumEndpoints =	3,
 	.bInterfaceClass =	USB_CLASS_VENDOR_SPEC,
+#ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
+	.bInterfaceSubClass = 0xE0,
+	.bInterfaceProtocol = 0x00,
+#else
 	.bInterfaceSubClass =	USB_CLASS_VENDOR_SPEC,
 	.bInterfaceProtocol =	USB_CLASS_VENDOR_SPEC,
+#endif
 	/* .iInterface = DYNAMIC */
 };
 
@@ -308,14 +313,19 @@ static int rmnet_gport_setup(void)
 	pr_debug("%s: bam ports: %u bam2bam ports: %u data hsic ports: %u data hsuart ports: %u"
 		" smd ports: %u ctrl hsic ports: %u ctrl hsuart ports: %u"
 		" nr_rmnet_ports: %u\n",
-		__func__, no_data_bam_ports, no_data_bam2bam_ports,
+		__func__, no_rmnet_data_bam_ports, no_data_bam2bam_ports,
 		no_data_hsic_ports, no_data_hsuart_ports, no_ctrl_smd_ports,
 		no_ctrl_hsic_ports, no_ctrl_hsuart_ports, nr_rmnet_ports);
 
-	if (no_data_bam_ports || no_data_bam2bam_ports) {
-		ret = gbam_setup(no_data_bam_ports,
-				 no_data_bam2bam_ports);
-		if (ret)
+	if (no_rmnet_data_bam_ports) {
+		ret = gbam_setup(no_rmnet_data_bam_ports);
+		if (ret < 0)
+			return ret;
+	}
+
+	if (no_data_bam2bam_ports) {
+		ret = gbam2bam_setup(no_data_bam2bam_ports);
+		if (ret < 0)
 			return ret;
 	}
 
@@ -1395,7 +1405,7 @@ static void frmnet_cleanup(void)
 	nr_rmnet_ports = 0;
 	no_ctrl_smd_ports = 0;
 	no_ctrl_qti_ports = 0;
-	no_data_bam_ports = 0;
+	no_rmnet_data_bam_ports = 0;
 	no_data_bam2bam_ports = 0;
 	no_ctrl_hsic_ports = 0;
 	no_data_hsic_ports = 0;
@@ -1465,8 +1475,8 @@ static int frmnet_init_port(const char *ctrl_name, const char *data_name,
 
 	switch (rmnet_port->data_xport) {
 	case USB_GADGET_XPORT_BAM:
-		rmnet_port->data_xport_num = no_data_bam_ports;
-		no_data_bam_ports++;
+		rmnet_port->data_xport_num = no_rmnet_data_bam_ports;
+		no_rmnet_data_bam_ports++;
 		break;
 	case USB_GADGET_XPORT_BAM2BAM:
 	case USB_GADGET_XPORT_BAM2BAM_IPA:
@@ -1502,7 +1512,7 @@ fail_probe:
 	nr_rmnet_ports = 0;
 	no_ctrl_smd_ports = 0;
 	no_ctrl_qti_ports = 0;
-	no_data_bam_ports = 0;
+	no_rmnet_data_bam_ports = 0;
 	no_ctrl_hsic_ports = 0;
 	no_data_hsic_ports = 0;
 	no_ctrl_hsuart_ports = 0;

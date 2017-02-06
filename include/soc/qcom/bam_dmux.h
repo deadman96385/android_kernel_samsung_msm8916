@@ -18,6 +18,12 @@
 
 #define BAM_DMUX_CH_NAME_MAX_LEN	20
 
+/* For 3G fast dormancy */
+#define BAM_DMUX_FD
+#ifdef BAM_DMUX_FD
+extern struct class *sec_class;
+#endif
+
 enum {
 	BAM_DMUX_DATA_RMNET_0,
 	BAM_DMUX_DATA_RMNET_1,
@@ -40,6 +46,7 @@ enum {
 	BAM_DMUX_DATA_REV_RMNET_6,
 	BAM_DMUX_DATA_REV_RMNET_7,
 	BAM_DMUX_DATA_REV_RMNET_8,
+	BAM_DMUX_USB_DPL,
 	BAM_DMUX_NUM_CHANNELS
 };
 

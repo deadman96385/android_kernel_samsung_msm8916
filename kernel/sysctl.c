@@ -131,6 +131,9 @@ static int __maybe_unused two = 2;
 static int __maybe_unused three = 3;
 static unsigned long one_ul = 1;
 static int one_hundred = 100;
+#ifdef CONFIG_INCREASE_MAXIMUM_SWAPPINESS
+static int max_swappiness = 200;
+#endif
 #ifdef CONFIG_PRINTK
 static int ten_thousand = 10000;
 #endif
@@ -145,7 +148,7 @@ static int min_percpu_pagelist_fract = 8;
 
 static int ngroups_max = NGROUPS_MAX;
 static const int cap_last_cap = CAP_LAST_CAP;
-
+unsigned int sysctl_sched_boot_complete_pct = 0;
 /*this is needed for proc_doulongvec_minmax of sysctl_hung_task_timeout_secs */
 #ifdef CONFIG_DETECT_HUNG_TASK
 static unsigned long hung_task_timeout_max = (LONG_MAX/HZ);
@@ -307,14 +310,16 @@ static struct ctl_table kern_table[] = {
 		.data		= &sysctl_sched_freq_inc_notify,
 		.maxlen		= sizeof(unsigned int),
 		.mode		= 0644,
-		.proc_handler	= proc_dointvec,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1		= &zero,
 	},
 	{
 		.procname	= "sched_freq_dec_notify",
 		.data		= &sysctl_sched_freq_dec_notify,
 		.maxlen		= sizeof(unsigned int),
 		.mode		= 0644,
-		.proc_handler	= proc_dointvec,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1		= &zero,
 	},
 	{
 		.procname       = "sched_migration_fixup",
@@ -338,6 +343,13 @@ static struct ctl_table kern_table[] = {
 		.proc_handler   = sched_hmp_proc_update_handler,
 	},
 #endif
+	{
+		.procname		= "sched_boot_complete",
+		.data			= &sysctl_sched_boot_complete_pct,
+		.maxlen			= sizeof(int),
+		.mode			= 0644,
+		.proc_handler	= proc_dointvec
+	},
 #ifdef CONFIG_SCHED_HMP
 	{
 		.procname       = "sched_account_wait_time",
@@ -393,7 +405,8 @@ static struct ctl_table kern_table[] = {
 		.data		= &sysctl_sched_spill_nr_run,
 		.maxlen		= sizeof(unsigned int),
 		.mode		= 0644,
-		.proc_handler	= proc_dointvec,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1		= &zero,
 	},
 	{
 		.procname	= "sched_upmigrate",
@@ -414,7 +427,7 @@ static struct ctl_table kern_table[] = {
 		.data		= &sysctl_sched_upmigrate_min_nice,
 		.maxlen		= sizeof(unsigned int),
 		.mode		= 0644,
-		.proc_handler	= proc_dointvec,
+		.proc_handler	= sched_hmp_proc_update_handler,
 	},
 	{
 		.procname	= "sched_prefer_idle",
@@ -1372,7 +1385,11 @@ static struct ctl_table vm_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= &zero,
+#ifdef CONFIG_INCREASE_MAXIMUM_SWAPPINESS
+		.extra2		= &max_swappiness,
+#else
 		.extra2		= &one_hundred,
+#endif
 	},
 #ifdef CONFIG_HUGETLB_PAGE
 	{
@@ -1440,7 +1457,7 @@ static struct ctl_table vm_table[] = {
 		.procname	= "compact_memory",
 		.data		= &sysctl_compact_memory,
 		.maxlen		= sizeof(int),
-		.mode		= 0200,
+		.mode		= 0644,
 		.proc_handler	= sysctl_compaction_handler,
 	},
 	{
@@ -1454,6 +1471,15 @@ static struct ctl_table vm_table[] = {
 	},
 
 #endif /* CONFIG_COMPACTION */
+#ifdef CONFIG_ZSWAP
+	{
+		.procname	= "zswap_compact",
+		.data		= &sysctl_zswap_compact,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler	= sysctl_zswap_compaction_handler,
+	},
+#endif
 	{
 		.procname	= "min_free_kbytes",
 		.data		= &min_free_kbytes,
@@ -2797,6 +2823,11 @@ int proc_do_large_bitmap(struct ctl_table *table, int write,
 }
 
 #else /* CONFIG_PROC_SYSCTL */
+int is_boot_complete(void)
+{
+	return sysctl_sched_boot_complete_pct;
+}
+EXPORT_SYMBOL(is_boot_complete);
 
 int proc_dostring(struct ctl_table *table, int write,
 		  void __user *buffer, size_t *lenp, loff_t *ppos)

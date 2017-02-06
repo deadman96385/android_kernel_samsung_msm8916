@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2015, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -311,8 +311,10 @@ static int msm_dt_node_to_map(struct pinctrl_dev *pctldev,
 
 	/* Allocate memory for pin-map entries */
 	map = kzalloc(sizeof(*map) * map_cnt, GFP_KERNEL);
-	if (!map)
+	if (!map) {
+		kfree(cfg);
 		return -ENOMEM;
+	}
 	*nmaps = 0;
 
 	/* Get group name from node */
@@ -364,7 +366,7 @@ static void msm_dt_free_map(struct pinctrl_dev *pctldev,
 	for (idx = 0; idx < num_maps; idx++) {
 		if (map[idx].type == PIN_MAP_TYPE_CONFIGS_GROUP)
 			kfree(map[idx].data.configs.configs);
-		else if (map->type == PIN_MAP_TYPE_MUX_GROUP)
+		else if (map[idx].type == PIN_MAP_TYPE_MUX_GROUP)
 			kfree(map[idx].data.mux.function);
 	};
 

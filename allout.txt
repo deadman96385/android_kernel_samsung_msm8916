@@ -1,0 +1,242 @@
+number of tags to check: 450
+Process Process-1:
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+    self._target(*self._args, **self._kwargs)
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 72, in background
+    print("%s has %d lines changed" % (tn, tc))
+TypeError: %d format: a number is required, not NoneType
+Process PoolWorker-8:
+Process PoolWorker-6:
+Process PoolWorker-7:
+Process PoolWorker-2:
+Process PoolWorker-3:
+Process PoolWorker-4:
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Process PoolWorker-9:
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+Process PoolWorker-5:
+Traceback (most recent call last):
+    self.run()
+    self.run()
+    self.run()
+    self.run()
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+    self.run()
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 258, in _bootstrap
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+    self.run()
+    self.run()
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+    self._target(*self._args, **self._kwargs)
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+    self._target(*self._args, **self._kwargs)
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 113, in worker
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 113, in worker
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 113, in worker
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 113, in worker
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 113, in worker
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 113, in worker
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 113, in worker
+    self.run()
+  File "/usr/lib/python2.7/multiprocessing/process.py", line 114, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 113, in worker
+    result = (True, func(*args, **kwds))
+    result = (True, func(*args, **kwds))
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 65, in mapstar
+    result = (True, func(*args, **kwds))
+    result = (True, func(*args, **kwds))
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 65, in mapstar
+    result = (True, func(*args, **kwds))
+    return map(*args)
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 65, in mapstar
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 65, in mapstar
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 65, in mapstar
+    return map(*args)
+    result = (True, func(*args, **kwds))
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 53, in worker
+    result = (True, func(*args, **kwds))
+    return map(*args)
+    return map(*args)
+    return map(*args)
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 53, in worker
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 65, in mapstar
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 65, in mapstar
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 53, in worker
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 53, in worker
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 53, in worker
+    return map(*args)
+    return map(*args)
+    tc = get_total_changes(tag_name)
+    result = (True, func(*args, **kwds))
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 53, in worker
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 53, in worker
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 39, in get_total_changes
+  File "/usr/lib/python2.7/multiprocessing/pool.py", line 65, in mapstar
+    tc = get_total_changes(tag_name)
+    comm = run_subprocess(cmd)
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 39, in get_total_changes
+    return map(*args)
+    tc = get_total_changes(tag_name)
+    tc = get_total_changes(tag_name)
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 20, in run_subprocess
+    tc = get_total_changes(tag_name)
+    comm = run_subprocess(cmd)
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 53, in worker
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 39, in get_total_changes
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 39, in get_total_changes
+    comm = sp.communicate()
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 39, in get_total_changes
+    tc = get_total_changes(tag_name)
+    tc = get_total_changes(tag_name)
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 20, in run_subprocess
+    comm = run_subprocess(cmd)
+  File "/usr/lib/python2.7/subprocess.py", line 800, in communicate
+    comm = run_subprocess(cmd)
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 39, in get_total_changes
+    comm = run_subprocess(cmd)
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 39, in get_total_changes
+    comm = sp.communicate()
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 20, in run_subprocess
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 20, in run_subprocess
+    tc = get_total_changes(tag_name)
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 20, in run_subprocess
+    comm = run_subprocess(cmd)
+  File "/usr/lib/python2.7/subprocess.py", line 800, in communicate
+    comm = run_subprocess(cmd)
+    comm = sp.communicate()
+    comm = sp.communicate()
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 39, in get_total_changes
+    comm = sp.communicate()
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 20, in run_subprocess
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 20, in run_subprocess
+  File "/usr/lib/python2.7/subprocess.py", line 800, in communicate
+  File "/usr/lib/python2.7/subprocess.py", line 800, in communicate
+    comm = run_subprocess(cmd)
+  File "/usr/lib/python2.7/subprocess.py", line 800, in communicate
+    comm = sp.communicate()
+    comm = sp.communicate()
+  File "/1TB_HDD/Sean/caf/t560nu/best_kernel", line 20, in run_subprocess
+  File "/usr/lib/python2.7/subprocess.py", line 800, in communicate
+  File "/usr/lib/python2.7/subprocess.py", line 800, in communicate
+    comm = sp.communicate()
+  File "/usr/lib/python2.7/subprocess.py", line 800, in communicate
+    return self._communicate(input)
+  File "/usr/lib/python2.7/subprocess.py", line 1417, in _communicate
+    stdout, stderr = self._communicate_with_poll(input)
+  File "/usr/lib/python2.7/subprocess.py", line 1471, in _communicate_with_poll
+    ready = poller.poll()
+    return self._communicate(input)
+  File "/usr/lib/python2.7/subprocess.py", line 1417, in _communicate
+KeyboardInterrupt
+    stdout, stderr = self._communicate_with_poll(input)
+  File "/usr/lib/python2.7/subprocess.py", line 1471, in _communicate_with_poll
+    return self._communicate(input)
+    return self._communicate(input)
+    ready = poller.poll()
+  File "/usr/lib/python2.7/subprocess.py", line 1417, in _communicate
+    return self._communicate(input)
+  File "/usr/lib/python2.7/subprocess.py", line 1417, in _communicate
+ 46074 files changed, 18559059 deletions(-)
+
+ 46075 files changed, 18559585 deletions(-)
+
+ 46076 files changed, 18560017 deletions(-)
+
+  File "/usr/lib/python2.7/subprocess.py", line 1417, in _communicate
+    stdout, stderr = self._communicate_with_poll(input)
+    return self._communicate(input)
+    stdout, stderr = self._communicate_with_poll(input)
+KeyboardInterrupt
+    return self._communicate(input)
+    return self._communicate(input)
+  File "/usr/lib/python2.7/subprocess.py", line 1471, in _communicate_with_poll
+    stdout, stderr = self._communicate_with_poll(input)
+  File "/usr/lib/python2.7/subprocess.py", line 1417, in _communicate
+  File "/usr/lib/python2.7/subprocess.py", line 1471, in _communicate_with_poll
+  File "/usr/lib/python2.7/subprocess.py", line 1417, in _communicate
+  File "/usr/lib/python2.7/subprocess.py", line 1417, in _communicate
+    ready = poller.poll()
+  File "/usr/lib/python2.7/subprocess.py", line 1471, in _communicate_with_poll
+ 46060 files changed, 18552484 deletions(-)
+
+ 46060 files changed, 18553427 deletions(-)
+
+ 46061 files changed, 18554431 deletions(-)
+
+    stdout, stderr = self._communicate_with_poll(input)
+    ready = poller.poll()
+    stdout, stderr = self._communicate_with_poll(input)
+    stdout, stderr = self._communicate_with_poll(input)
+    ready = poller.poll()
+KeyboardInterrupt
+  File "/usr/lib/python2.7/subprocess.py", line 1471, in _communicate_with_poll
+  File "/usr/lib/python2.7/subprocess.py", line 1471, in _communicate_with_poll
+  File "/usr/lib/python2.7/subprocess.py", line 1471, in _communicate_with_poll
+KeyboardInterrupt
+KeyboardInterrupt
+    ready = poller.poll()
+    ready = poller.poll()
+    ready = poller.poll()
+ 46090 files changed, 18567674 deletions(-)
+
+ 46090 files changed, 18567748 deletions(-)
+
+ 46090 files changed, 18567862 deletions(-)
+
+KeyboardInterrupt
+ 46061 files changed, 18554449 deletions(-)
+
+ 46061 files changed, 18554357 deletions(-)
+
+ 46061 files changed, 18554138 deletions(-)
+
+ 46090 files changed, 18564402 deletions(-)
+
+ 46090 files changed, 18564402 deletions(-)
+
+ 46090 files changed, 18565093 deletions(-)
+
+KeyboardInterrupt
+KeyboardInterrupt
+ 46065 files changed, 18556592 deletions(-)
+
+ 46065 files changed, 18556611 deletions(-)
+
+ 46065 files changed, 18556611 deletions(-)
+
+ 46074 files changed, 18558523 deletions(-)
+
+ 46075 files changed, 18558958 deletions(-)
+
+ 46076 files changed, 18559303 deletions(-)
+
+ 46090 files changed, 18567316 deletions(-)
+
+ 46090 files changed, 18567343 deletions(-)
+
+ 46090 files changed, 18567339 deletions(-)
+

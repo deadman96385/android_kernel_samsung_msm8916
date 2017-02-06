@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -55,7 +55,7 @@
 #define C0_G_Y		0	/* G/luma */
 
 /* wait for at most 2 vsync for lowest refresh rate (24hz) */
-#define KOFF_TIMEOUT msecs_to_jiffies(84)
+#define KOFF_TIMEOUT msecs_to_jiffies(1000)
 
 #define OVERFETCH_DISABLE_TOP		BIT(0)
 #define OVERFETCH_DISABLE_BOTTOM	BIT(1)
@@ -184,6 +184,9 @@ struct mdss_mdp_ctl {
 	u32 num;
 	char __iomem *base;
 	char __iomem *wb_base;
+#if defined(CONFIG_FB_MSM_MDSS_SAMSUNG)
+	resource_size_t physical_base;
+#endif
 	u32 ref_cnt;
 	int power_state;
 
@@ -220,6 +223,7 @@ struct mdss_mdp_ctl {
 	struct mdss_mdp_mixer *mixer_left;
 	struct mdss_mdp_mixer *mixer_right;
 	struct mutex lock;
+	struct mutex offlock;
 	struct mutex *shared_lock;
 	spinlock_t spin_lock;
 
@@ -240,6 +244,7 @@ struct mdss_mdp_ctl {
 	int (*display_fnc) (struct mdss_mdp_ctl *ctl, void *arg);
 	int (*wait_fnc) (struct mdss_mdp_ctl *ctl, void *arg);
 	int (*wait_pingpong) (struct mdss_mdp_ctl *ctl, void *arg);
+	int (*wait_video_pingpong) (struct mdss_mdp_ctl *ctl, void *arg);
 	u32 (*read_line_cnt_fnc) (struct mdss_mdp_ctl *);
 	int (*add_vsync_handler) (struct mdss_mdp_ctl *,
 					struct mdss_mdp_vsync_handler *);
@@ -253,7 +258,7 @@ struct mdss_mdp_ctl {
 
 	void *priv_data;
 	u32 wb_type;
-	bool prg_fet;
+	u32 prg_fet;
 };
 
 struct mdss_mdp_mixer {
@@ -494,6 +499,7 @@ struct mdss_overlay_private {
 	struct mdss_mdp_data free_list[MAX_FREE_LIST_SIZE];
 	int free_list_size;
 	int ad_state;
+	int dyn_pu_state;
 
 	bool handoff;
 	u32 splash_mem_addr;
@@ -513,6 +519,34 @@ struct mdss_mdp_commit_cb {
 	int (*commit_cb_fnc) (enum mdp_commit_stage_type commit_state,
 		void *data);
 };
+
+#if defined(CONFIG_FB_MSM_MDSS_SAMSUNG)
+struct mdss_mdp_cmd_ctx {
+	struct mdss_mdp_ctl *ctl;
+	u32 pp_num;
+	u8 ref_cnt;
+	struct completion stop_comp;
+	wait_queue_head_t pp_waitq;
+	struct list_head vsync_handlers;
+	int panel_power_state;
+	atomic_t koff_cnt;
+	u32 intf_stopped;
+	int clk_enabled;
+	int vsync_enabled;
+	int rdptr_enabled;
+	struct mutex clk_mtx;
+	spinlock_t clk_lock;
+	spinlock_t koff_lock;
+	struct work_struct clk_work;
+	struct work_struct pp_done_work;
+	atomic_t pp_done_cnt;
+	struct mdss_intf_recovery intf_recovery;
+	struct mdss_mdp_cmd_ctx *sync_ctx; /* for partial update */
+	u32 pp_timeout_report_cnt;
+};
+#endif
+
+
 
 /**
  * enum mdss_screen_state - Screen states that MDP can be forced into
@@ -621,6 +655,15 @@ static inline int mdss_mdp_iommu_dyn_attach_supported(
 static inline int mdss_mdp_line_buffer_width(void)
 {
 	return MAX_LINE_BUFFER_WIDTH;
+}
+
+static inline bool mdss_mdp_req_init_restore_cfg(struct mdss_data_type *mdata)
+{
+	if ((mdata->mdp_rev == MDSS_MDP_HW_REV_106) ||
+                (mdata->mdp_rev == MDSS_MDP_HW_REV_108))
+		return true;
+
+	return false;
 }
 
 static inline int mdss_mdp_panic_signal_support_mode(
@@ -783,7 +826,7 @@ int mdss_mdp_perf_bw_check_pipe(struct mdss_mdp_perf_params *perf,
 int mdss_mdp_perf_calc_pipe(struct mdss_mdp_pipe *pipe,
 	struct mdss_mdp_perf_params *perf, struct mdss_rect *roi,
 	u32 flags);
-u32 mdss_mdp_calc_latency_buf_bytes(bool is_yuv, bool is_bwc,
+u32 mdss_mdp_calc_latency_buf_bytes(bool is_bwc,
 	bool is_tile, u32 src_w, u32 bpp, bool use_latency_buf_percentage,
 	u32 smp_bytes);
 u32 mdss_mdp_get_mdp_clk_rate(struct mdss_data_type *mdata);
@@ -877,7 +920,7 @@ void mdss_mdp_pipe_unmap(struct mdss_mdp_pipe *pipe);
 struct mdss_mdp_pipe *mdss_mdp_pipe_alloc_dma(struct mdss_mdp_mixer *mixer);
 
 u32 mdss_mdp_smp_calc_num_blocks(struct mdss_mdp_pipe *pipe);
-u32 mdss_mdp_smp_get_size(struct mdss_mdp_pipe *pipe);
+u32 mdss_mdp_smp_get_size(struct mdss_mdp_pipe *pipe, u32 num_planes);
 int mdss_mdp_smp_reserve(struct mdss_mdp_pipe *pipe);
 void mdss_mdp_smp_unreserve(struct mdss_mdp_pipe *pipe);
 void mdss_mdp_smp_release(struct mdss_mdp_pipe *pipe);
@@ -921,7 +964,8 @@ void mdss_mdp_crop_rect(struct mdss_rect *src_rect,
 	const struct mdss_rect *sci_rect);
 
 
-int mdss_mdp_wb_kickoff(struct msm_fb_data_type *mfd);
+int mdss_mdp_wb_kickoff(struct msm_fb_data_type *mfd,
+		struct mdss_mdp_commit_cb *commit_cb);
 int mdss_mdp_wb_ioctl_handler(struct msm_fb_data_type *mfd, u32 cmd, void *arg);
 
 int mdss_mdp_get_ctl_mixers(u32 fb_num, u32 *mixer_id);
@@ -951,4 +995,8 @@ int mdss_mdp_wb_set_secure(struct msm_fb_data_type *mfd, int enable);
 int mdss_mdp_wb_get_secure(struct msm_fb_data_type *mfd, uint8_t *enable);
 void mdss_mdp_ctl_restore(void);
 int  mdss_mdp_ctl_reset(struct mdss_mdp_ctl *ctl);
+#if defined(CONFIG_FB_MSM_MDSS_SAMSUNG)
+void mdss_dsi_check_te(void);
+void mdss_mdp_underrun_clk_info(void);
+#endif
 #endif /* MDSS_MDP_H */

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2015, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -32,10 +32,11 @@
 
 #define STATUS_CHECK_INTERVAL_MS 5000
 #define STATUS_CHECK_INTERVAL_MIN_MS 50
-#define DSI_STATUS_CHECK_DISABLE 0
+#define DSI_STATUS_CHECK_INIT -1
+#define DSI_STATUS_CHECK_DISABLE 1
 
 static uint32_t interval = STATUS_CHECK_INTERVAL_MS;
-static uint32_t dsi_status_disable = DSI_STATUS_CHECK_DISABLE;
+static int32_t dsi_status_disable = DSI_STATUS_CHECK_INIT;
 struct dsi_status_data *pstatus_data;
 
 /*
@@ -60,7 +61,8 @@ static void check_dsi_ctrl_status(struct work_struct *work)
 		return;
 	}
 
-	if (mdss_panel_is_power_off(pdsi_status->mfd->panel_power_state)) {
+	if (mdss_panel_is_power_off(pdsi_status->mfd->panel_power_state) ||
+			pdsi_status->mfd->shutdown_pending) {
 		pr_err("%s: panel off\n", __func__);
 		return;
 	}
@@ -134,15 +136,17 @@ static int fb_event_callback(struct notifier_block *self,
 
 	pinfo = &ctrl_pdata->panel_data.panel_info;
 
-	if (!(pinfo->esd_check_enabled)) {
-		pr_debug("ESD check is not enaled in panel dtsi\n");
+	if ((!(pinfo->esd_check_enabled) &&
+			dsi_status_disable) ||
+			(dsi_status_disable == DSI_STATUS_CHECK_DISABLE)) {
+		pr_debug("ESD check is disabled.\n");
+		cancel_delayed_work(&pdata->check_status);
 		return NOTIFY_DONE;
 	}
 
-	if (dsi_status_disable) {
-		pr_debug("%s: DSI status disabled\n", __func__);
-		return NOTIFY_DONE;
-	}
+#if defined(CONFIG_FB_MSM_MDSS_SAMSUNG)
+	ctrl_pdata->panel_data.event_handler(&ctrl_pdata->panel_data, MDSS_SAMSUNG_EVENT_FB_EVENT_CALLBACK, &interval );
+#endif
 
 	pdata->mfd = evdata->info->par;
 	if (event == FB_EVENT_BLANK) {
@@ -153,6 +157,10 @@ static int fb_event_callback(struct notifier_block *self,
 
 		switch (*blank) {
 		case FB_BLANK_UNBLANK:
+#if defined(CONFIG_FB_MSM_MDSS_SAMSUNG)
+		if (!ctrl_pdata->status_mode == ESD_REG_IRQ)
+#endif
+
 			schedule_delayed_work(&pdata->check_status,
 				msecs_to_jiffies(interval));
 			break;
@@ -160,6 +168,11 @@ static int fb_event_callback(struct notifier_block *self,
 		case FB_BLANK_HSYNC_SUSPEND:
 		case FB_BLANK_VSYNC_SUSPEND:
 		case FB_BLANK_NORMAL:
+#if defined(CONFIG_FB_MSM_MDSS_SAMSUNG)
+			if (ctrl_pdata->status_mode == ESD_REG_IRQ)
+				cancel_work_sync(&pdata->check_status.work);
+			else
+#endif
 			cancel_delayed_work(&pdata->check_status);
 			break;
 		default:
